@@ -1,0 +1,29 @@
+services:
+  api:
+    build: ./backend
+    environment:
+      APP_ENVIRONMENT: ${APP_ENVIRONMENT:-production}
+      APP_SECRET_KEY: ${APP_SECRET_KEY:?set APP_SECRET_KEY to a long random value}
+      APP_DATABASE_URL: sqlite:////srv/data/app.db
+      APP_CORS_ORIGINS: ${APP_CORS_ORIGINS:-http://localhost:8080}
+      APP_BOOTSTRAP_ADMIN_EMAIL: ${APP_BOOTSTRAP_ADMIN_EMAIL:-admin@example.com}
+      APP_BOOTSTRAP_ADMIN_PASSWORD: ${APP_BOOTSTRAP_ADMIN_PASSWORD:?set a strong bootstrap password}
+    volumes:
+      - api-data:/srv/data
+    read_only: false
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+
+  web:
+    build: ./frontend
+    depends_on:
+      - api
+    ports:
+      - "8080:8080"
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+
+volumes:
+  api-data:
